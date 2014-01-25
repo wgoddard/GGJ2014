@@ -36,22 +36,21 @@ public class Character : MonoBehaviour
 	public Vector2 aim;
 	Vector3 aimDirection;
 
-
+	public int gunType = 0;
+	
 	private float timer = 0.0f;
 	public float shotgunDelay = 0.25f;
 	public float machineGunDelay = 0.05f;
 	public float rocketLauncherDelay = 0.75f;
+
+	public float health = 10.0f;
 
 	public AbstractGoTween spritetween;
 
 	// Use this for initialization
 	void Start ()
 	{
-
-		if(InputManager.Devices.Count >= playerId)
-			isAlive = true;
-		else
-			isAlive = false;
+		isAlive = true;
 
 		crosshair = transform.FindChild ("Crosshair").gameObject;
 		crosshair.renderer.enabled = false;
@@ -64,13 +63,7 @@ public class Character : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if(InputManager.Devices.Count >= playerId)
-			isAlive = true;
-		else
-			isAlive = false;
-
-		if (isAlive) {
-
+		if (InputManager.Devices.Count >= playerId && isAlive) {
 			controller = InputManager.Devices [playerId - 1];
 			action = controller.GetControl (InputControlType.Action1);
 			shoot = controller.GetControl (InputControlType.RightBumper);
@@ -98,38 +91,59 @@ public class Character : MonoBehaviour
 				audio.Play ();
 				GameObject blast = GameObject.Instantiate (shotPrefab, transform.position + aimDirection * 0.1f, Quaternion.identity) as GameObject;
 				blast.transform.parent = gameObject.transform;
+				Go.to( blast.transform, 0.1f, new GoTweenConfig().shake( new Vector3(0.15f, 0.15f, 0 ), GoShakeType.Position | GoShakeType.Scale));
 
+				GameObject bullet = null;
 				//Machine Gun
-				GameObject bullet = GameObject.Instantiate (bulletPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
-				Bullet b = bullet.GetComponent<Bullet> ();
-				b.speed = 20.0f + Random.Range(-5, 5);
-				b.direction = new Vector3(aimDirection.x + Random.Range(-0.1f, 0.1f), aimDirection.y + Random.Range(-0.1f, 0.1f));
-				timer = machineGunDelay;
-				b.lifespan = 1.0f;
-
-
-				//Shot Gun
-				/*for(int i = -2; i < 4; i++)
+				if(gunType == 1)
 				{
-					GameObject bullet = GameObject.Instantiate (bulletPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
+					bullet = GameObject.Instantiate (bulletPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
 					Bullet b = bullet.GetComponent<Bullet> ();
-					b.speed = 15.0f + Random.Range(-5, 5);
-					b.direction = new Vector3(aimDirection.x + Random.Range(-0.1f, 0.1f) * (i * 3), aimDirection.y + Random.Range(-0.1f, 0.1f) * (i * 3));
-					b.lifespan = 0.5f;
+					b.speed = 20.0f + Random.Range(-5, 5);
+					b.direction = new Vector3(aimDirection.x + Random.Range(-0.1f, 0.1f), aimDirection.y + Random.Range(-0.1f, 0.1f));
+					timer = machineGunDelay;
+					b.lifespan = 1.0f;
+					b.damage = 2.0f;
 				}
-				timer = shotgunDelay;*/
-
-				//Rocket Launcher
-
-				//Flamethrower
-				/*for(int i = 0; i < 10; i++)
+				else if(gunType == 2)
 				{
-					GameObject bullet = GameObject.Instantiate (bulletPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
+					//Shot Gun
+					for(int i = -2; i < 4; i++)
+					{
+						bullet = GameObject.Instantiate (bulletPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
+						Bullet b = bullet.GetComponent<Bullet> ();
+						b.speed = 15.0f + Random.Range(-5, 5);
+						b.direction = new Vector3(aimDirection.x + Random.Range(-0.1f, 0.1f) * (i * 3), aimDirection.y + Random.Range(-0.1f, 0.1f) * (i * 3));
+						b.lifespan = 0.5f;
+						b.damage = 4.0f;
+					}
+					timer = shotgunDelay;
+				}
+				else if(gunType == 3)
+				{
+					//Rocket Launcher
+					bullet = GameObject.Instantiate (bulletPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
 					Bullet b = bullet.GetComponent<Bullet> ();
-					b.speed = 1f + Random.Range(-0.5f, 0.5f);
-					b.direction = new Vector3(aimDirection.x + Random.Range(-0.5f, 0.5f), aimDirection.y + Random.Range(-0.5f, 0.5f));
-					b.lifespan = 0.75f;
-				}*/
+					b.speed = 5.0f + Random.Range(-1, 1);
+					b.direction = new Vector3(aimDirection.x + Random.Range(-0.1f, 0.1f), aimDirection.y + Random.Range(-0.1f, 0.1f));
+					b.lifespan = 1.5f;
+					b.damage = 10.0f;
+					timer = rocketLauncherDelay;
+				}
+				else if(gunType == 4)
+				{
+					//Flamethrower
+					for(int i = 0; i < 10; i++)
+					{
+						bullet = GameObject.Instantiate (bulletPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
+						Bullet b = bullet.GetComponent<Bullet> ();
+						b.speed = 1f + Random.Range(-0.5f, 0.5f);
+						b.direction = new Vector3(aimDirection.x + Random.Range(-0.5f, 0.5f), aimDirection.y + Random.Range(-0.5f, 0.5f));
+						b.lifespan = 0.75f;
+						b.damage = 0.5f;
+					}
+				}
+				Go.to( bullet.transform, 0.25f, new GoTweenConfig().shake( new Vector3(0.25f, 0.25f, 0 ), GoShakeType.Scale));
 
 				//Juicing
 				Go.to( tk2dCamera.Instance.transform, 0.1f, new GoTweenConfig().shake( new Vector3( 0.25f, 0.25f, 0 ), GoShakeType.Position) );
@@ -149,16 +163,19 @@ public class Character : MonoBehaviour
 		if (c.gameObject.CompareTag ("Gun")) {
 			UIpickup(c.gameObject);
 			c.enabled = false;
+			gunType = c.GetComponent<GunBox>().gunType;
 			//SoundManager.PlaySFX(pickupClip);
 			audio.PlayOneShot (pickupClip);
 			hasWeapon = true;
 			crosshair.renderer.enabled = true;
 		} else if (c.gameObject.CompareTag ("Bullet")) {
 			audio.PlayOneShot (hitClip);
-			isAlive = false;
-			PunchHit(transform.GetChild(1).gameObject);
-			Go.to(gameObject.transform, 0.1f, new GoTweenConfig().position(c.GetComponent<Bullet>().direction));
-			//iTween.MoveBy(gameObject, -c.GetComponent<Bullet>().direction, 0.1f);
+			health -= c.gameObject.GetComponent<Bullet>().damage;
+			if(health <= 0.0f) {
+				isAlive = false;
+			}
+			PunchHit(gameObject);
+			//Go.to(gameObject.transform, 0.1f, new GoTweenConfig().position(c.GetComponent<Bullet>().direction));
 		} else if (c.gameObject.CompareTag ("Food")) {
 			UIpickup(c.gameObject);
 			c.enabled = false;
@@ -175,7 +192,8 @@ public class Character : MonoBehaviour
 			-(destination - transform.position) * 0.25f,
 			destination + new Vector3 (0.4f, 0.0f, 0.0f)
 		};
-		iTween.MoveTo (pickup, iTween.Hash ("path", path, "time", 1.0f, "easetype", iTween.EaseType.easeInQuad, "oncomplete", "PunchHit", "oncompleteparams", pickup, "oncompletetarget", gameObject));
+		Go.to(pickup.transform, 0.25f, new GoTweenConfig().setEaseType(GoEaseType.QuadIn).position(destination));
+		Go.to(pickup.transform, 0.25f, new GoTweenConfig().scale(new Vector3(0.5f, 0.5f, 1)));
 	}
 	
 	void PunchHit (GameObject _t)
@@ -184,6 +202,6 @@ public class Character : MonoBehaviour
 			spritetween.complete();
 			spritetween.destroy();
 		}
-		spritetween = Go.to( _t.transform, 0.5f, new GoTweenConfig().shake( new Vector3( 0.1f, 0.1f, 0.0f ), GoShakeType.Position ) );
+		spritetween = Go.to( _t.transform, 0.1f, new GoTweenConfig().shake( new Vector3( 0.2f, 0.2f, 0.0f), GoShakeType.Position));
 	}
 }
