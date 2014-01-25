@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using InControl;
 
 public class LevelController : MonoBehaviour {
 
@@ -8,11 +9,13 @@ public class LevelController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+		InputManager.Setup ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+		InputManager.Update ();
 
         roundTime -= Time.deltaTime;
         roundTimeText.text = roundTime.ToString("#.##");
