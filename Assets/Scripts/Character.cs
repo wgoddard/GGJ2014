@@ -24,6 +24,7 @@ public class Character : MonoBehaviour
 	public bool isAlive;
 	public AudioClip pickupClip;
 	public AudioClip hitClip;
+    public AudioClip machineShotClip;
 	private InputDevice controller;
 
 
@@ -33,8 +34,8 @@ public class Character : MonoBehaviour
 	private InputControl shoot; 
 	
 	public Vector2 movement;
-	public Vector2 aim;
-	Vector3 aimDirection;
+	public Vector2 aim = Vector2.right;
+	Vector3 aimDirection = Vector3.right;
 
 	public int gunType = 0;
 	
@@ -76,9 +77,22 @@ public class Character : MonoBehaviour
 				Application.LoadLevel (Application.loadedLevel);
 			}
 
-			if(!shoot.IsPressed ||!hasWeapon)
-				transform.Translate (new Vector3 (movement.x, movement.y) * Time.deltaTime * movementSpeed);
-
+            if (!shoot.IsPressed || !hasWeapon)
+            {
+                transform.Translate(movement * Time.deltaTime * movementSpeed);
+                Animation a = GetComponentInChildren<Animation>();
+                if (a != null)
+                {
+                    if (movement.magnitude > 0.0f)
+                    {
+                         a.Play("Run");
+                    }
+                    else
+                    {
+                        a.Play("Idle");
+                    }
+              }
+            }
 
 			//float angle = Mathf.Atan2(aim.y, aim.x) * (180 / Mathf.PI); 
 			if(aim.magnitude > 0) {
@@ -87,8 +101,9 @@ public class Character : MonoBehaviour
 
 			crosshair.transform.position = transform.position + aimDirection * 1.0f;
 
+			//Debug.Log(hasWeapon)
+
 			if (hasWeapon && shoot.IsPressed && timer <= 0.0f) {
-				audio.Play ();
 				GameObject blast = GameObject.Instantiate (shotPrefab, transform.position + aimDirection * 0.1f, Quaternion.identity) as GameObject;
 				blast.transform.parent = gameObject.transform;
 				Go.to( blast.transform, 0.1f, new GoTweenConfig().shake( new Vector3(0.15f, 0.15f, 0 ), GoShakeType.Position | GoShakeType.Scale));
@@ -104,6 +119,7 @@ public class Character : MonoBehaviour
 					timer = machineGunDelay;
 					b.lifespan = 1.0f;
 					b.damage = 2.0f;
+					SoundManager.PlaySFX(machineShotClip);
 				}
 				else if(gunType == 2)
 				{
@@ -118,6 +134,7 @@ public class Character : MonoBehaviour
 						b.damage = 4.0f;
 					}
 					timer = shotgunDelay;
+					SoundManager.PlaySFX(machineShotClip);
 				}
 				else if(gunType == 3)
 				{
@@ -129,6 +146,7 @@ public class Character : MonoBehaviour
 					b.lifespan = 1.5f;
 					b.damage = 10.0f;
 					timer = rocketLauncherDelay;
+					SoundManager.PlaySFX(machineShotClip);
 				}
 				else if(gunType == 4)
 				{
@@ -142,6 +160,7 @@ public class Character : MonoBehaviour
 						b.lifespan = 0.75f;
 						b.damage = 0.5f;
 					}
+					SoundManager.PlaySFX(machineShotClip);
 				}
 				Go.to( bullet.transform, 0.25f, new GoTweenConfig().shake( new Vector3(0.25f, 0.25f, 0 ), GoShakeType.Scale));
 
@@ -164,25 +183,24 @@ public class Character : MonoBehaviour
 			UIpickup(c.gameObject);
 			c.enabled = false;
 			gunType = c.GetComponent<GunBox>().gunType;
-			//SoundManager.PlaySFX(pickupClip);
-			audio.PlayOneShot (pickupClip);
+			SoundManager.PlaySFX(pickupClip);
 			hasWeapon = true;
 			crosshair.renderer.enabled = true;
 		} else if (c.gameObject.CompareTag ("Bullet")) {
-			audio.PlayOneShot (hitClip);
+			SoundManager.PlaySFX(hitClip);
 			health -= c.gameObject.GetComponent<Bullet>().damage;
 			if(health <= 0.0f) {
 				isAlive = false;
 			}
 			PunchHit(gameObject);
 			//Go.to(gameObject.transform, 0.1f, new GoTweenConfig().position(c.GetComponent<Bullet>().direction));
+			hasWeapon = true;
 		} else if (c.gameObject.CompareTag ("Food")) {
 			UIpickup(c.gameObject);
 			c.enabled = false;
-			audio.PlayOneShot (pickupClip);
+            SoundManager.PlaySFX(pickupClip);
 			hasFood = true;
 		}
-
 	}
 
 	void UIpickup(GameObject pickup)

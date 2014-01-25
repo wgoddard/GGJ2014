@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using InControl;
 
 public class NarrativeController : MonoBehaviour {
 
@@ -20,6 +21,8 @@ public class NarrativeController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+        InputManager.Setup();
+
         messageIndex = 0;
         ChangeText(messageIndex);
         animTime = 0.0f;
@@ -27,6 +30,8 @@ public class NarrativeController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+        InputManager.Update();
 
         switch (myState)
         {
@@ -40,7 +45,8 @@ public class NarrativeController : MonoBehaviour {
                 }
             break;
             case TextState.Waiting:
-                if (Input.GetButtonDown("A_1"))
+                if (InputManager.ActiveDevice.Action1.IsPressed)
+                //if (Input.GetButtonDown("A_1"))
                 {
                     myState = TextState.AnimOut;
                     animTime = 0.0f;
