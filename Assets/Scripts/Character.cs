@@ -24,6 +24,7 @@ public class Character : MonoBehaviour
 	public bool isAlive;
 	public AudioClip pickupClip;
 	public AudioClip hitClip;
+    public AudioClip machineShotClip;
 	private InputDevice controller;
 
 
@@ -33,8 +34,8 @@ public class Character : MonoBehaviour
 	private InputControl shoot; 
 	
 	public Vector2 movement;
-	public Vector2 aim;
-	Vector3 aimDirection;
+	public Vector2 aim = Vector2.right;
+	Vector3 aimDirection = Vector3.right;
 
 
 	private float timer = 0.0f;
@@ -95,7 +96,6 @@ public class Character : MonoBehaviour
 			crosshair.transform.position = transform.position + aimDirection * 1.0f;
 
 			if (hasWeapon && shoot.IsPressed && timer <= 0.0f) {
-				audio.Play ();
 				GameObject blast = GameObject.Instantiate (shotPrefab, transform.position + aimDirection * 0.1f, Quaternion.identity) as GameObject;
 				blast.transform.parent = gameObject.transform;
 
@@ -106,6 +106,7 @@ public class Character : MonoBehaviour
 				b.direction = new Vector3(aimDirection.x + Random.Range(-0.1f, 0.1f), aimDirection.y + Random.Range(-0.1f, 0.1f));
 				timer = machineGunDelay;
 				b.lifespan = 1.0f;
+                SoundManager.PlaySFX(machineShotClip);
 
 
 				//Shot Gun
@@ -149,12 +150,11 @@ public class Character : MonoBehaviour
 		if (c.gameObject.CompareTag ("Gun")) {
 			UIpickup(c.gameObject);
 			c.enabled = false;
-			//SoundManager.PlaySFX(pickupClip);
-			audio.PlayOneShot (pickupClip);
+		    SoundManager.PlaySFX(pickupClip);
 			hasWeapon = true;
 			crosshair.renderer.enabled = true;
 		} else if (c.gameObject.CompareTag ("Bullet")) {
-			audio.PlayOneShot (hitClip);
+            SoundManager.PlaySFX(hitClip);
 			isAlive = false;
 			PunchHit(transform.GetChild(1).gameObject);
 			Go.to(gameObject.transform, 0.1f, new GoTweenConfig().position(c.GetComponent<Bullet>().direction));
@@ -162,7 +162,7 @@ public class Character : MonoBehaviour
 		} else if (c.gameObject.CompareTag ("Food")) {
 			UIpickup(c.gameObject);
 			c.enabled = false;
-			audio.PlayOneShot (pickupClip);
+            SoundManager.PlaySFX(pickupClip);
 			hasFood = true;
 		}
 
