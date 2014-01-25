@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour {
     public float speed;
 	public float lifespan;
 	private float timer;
+	public float damage;
 
 	// Use this for initialization
 	void Start () {
