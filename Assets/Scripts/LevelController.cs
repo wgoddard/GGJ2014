@@ -15,8 +15,10 @@ public class LevelController : MonoBehaviour {
 	void Update () {
 
         roundTime -= Time.deltaTime;
-        roundTimeText.text = roundTime.ToString();
+        roundTimeText.text = roundTime.ToString("#.##");
+
         roundTimeText.Commit();
+
 
         if (roundTime < 0.0f)
         {
