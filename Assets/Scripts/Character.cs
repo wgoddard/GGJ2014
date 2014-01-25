@@ -84,8 +84,23 @@ public class Character : MonoBehaviour
 				Application.LoadLevel (Application.loadedLevel);
 			}
 
-			if(!shoot.IsPressed ||!hasWeapon)
-				transform.Translate (new Vector3 (movement.x, movement.y) * Time.deltaTime * movementSpeed);
+            if (!shoot.IsPressed || !hasWeapon)
+            {
+                transform.Translate(movement * Time.deltaTime * movementSpeed);
+                Animation a = GetComponentInChildren<Animation>();
+                if (a != null)
+                {
+                    if (movement.magnitude > 0.0f)
+                    {
+                         a.Play("Run");
+                    }
+                    else
+                    {
+                        a.Play("Idle");
+                    }
+              }
+            }
+
 
 
 			//float angle = Mathf.Atan2(aim.y, aim.x) * (180 / Mathf.PI); 
