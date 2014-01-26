@@ -45,6 +45,7 @@ public class LevelController : MonoBehaviour {
         if (roundTime < 0.0f)
         {
             EndGame();
+            roundTime = 30.0f;
         }
 
 

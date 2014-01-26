@@ -17,6 +17,11 @@ public class Ghost : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        if (GameObject.FindGameObjectWithTag("Narrative") != null)
+        {
+            return;
+        }
+
         transform.Translate((target.transform.position - transform.position) * Time.deltaTime * 1.0f);
 	
 	}
