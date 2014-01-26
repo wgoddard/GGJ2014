@@ -17,6 +17,8 @@ public class LevelController : MonoBehaviour {
 
     public bool zombieKilled;
 
+    public GameObject zombieDonut;    
+
     public int round;
 
 	// Use this for initialization
@@ -80,8 +82,8 @@ public class LevelController : MonoBehaviour {
             {
                 case 1:
                     Instantiate(secondNarrative);
-                    GameObject p2 = GameObject.Find("Player2");
-                    p2.GetComponentInChildren<SmoothMoves.BoneAnimation>().animationData = zombie;
+                    GameObject.Find("Donut").SetActive(false);
+                    zombieDonut.SetActive(true);
                     break;
                 case 2:
                     Instantiate(thirdNarrative);

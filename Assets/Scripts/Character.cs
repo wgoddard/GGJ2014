@@ -71,6 +71,12 @@ public class Character : MonoBehaviour
             return;
         }
 
+        if (!isAlive)
+        {
+            Animation a = GetComponentInChildren<Animation>();
+            a.Play("Dead");
+        }
+
 		if (InputManager.Devices.Count >= playerId && isAlive) {
 			controller = InputManager.Devices [playerId - 1];
 			action = controller.GetControl (InputControlType.Action1);
