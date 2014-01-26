@@ -26,6 +26,7 @@ public class Character : MonoBehaviour
 	public AudioClip hitClip;
     public AudioClip machineShotClip;
 	private InputDevice controller;
+	public Shader flashshader;
 
 
 	public float crosshairDistance = 5.0f;
@@ -47,6 +48,7 @@ public class Character : MonoBehaviour
 	public float health = 10.0f;
 
 	public AbstractGoTween spritetween;
+	public AbstractGoTween cameratween;
 
 	// Use this for initialization
 	void Start ()
@@ -165,12 +167,18 @@ public class Character : MonoBehaviour
 				Go.to( bullet.transform, 0.25f, new GoTweenConfig().shake( new Vector3(0.25f, 0.25f, 0 ), GoShakeType.Scale));
 
 				//Juicing
-				Go.to( tk2dCamera.Instance.transform, 0.1f, new GoTweenConfig().shake( new Vector3( 0.25f, 0.25f, 0 ), GoShakeType.Position) );
+				if(cameratween != null) {
+					cameratween.rewind();
+					cameratween.destroy();
+					cameratween = null;
+				}
+				tk2dCamera.Instance.transform.position = new Vector3(0, 0, -10);
+				cameratween = Go.to(tk2dCamera.Instance.transform, 0.1f, new GoTweenConfig().shake( new Vector3( 0.25f, 0.25f, 0 ), GoShakeType.Position) );
 				Go.to(gameObject.transform, 0.1f, new GoTweenConfig().position(transform.position - aimDirection/10.0f));
-
 
 				//GameObject casing = GameObject.Instantiate(casingPrefab, transform.position + aimDirection * 0.5f, Quaternion.identity) as GameObject;
 			}
+
 		}
 
 		if(timer > 0.0f)
@@ -193,6 +201,7 @@ public class Character : MonoBehaviour
 				isAlive = false;
 			}
 			PunchHit(gameObject);
+			transform.GetChild(1).renderer.material.shader = flashshader;
 			//Go.to(gameObject.transform, 0.1f, new GoTweenConfig().position(c.GetComponent<Bullet>().direction));
 			hasWeapon = true;
 		} else if (c.gameObject.CompareTag ("Food")) {
@@ -220,6 +229,6 @@ public class Character : MonoBehaviour
 			spritetween.complete();
 			spritetween.destroy();
 		}
-		spritetween = Go.to( _t.transform, 0.1f, new GoTweenConfig().shake( new Vector3( 0.2f, 0.2f, 0.0f), GoShakeType.Position));
+		spritetween = Go.to( _t.transform, 0.05f, new GoTweenConfig().shake( new Vector3( 0.2f, 0.2f, 0.0f), GoShakeType.Position));
 	}
 }
