@@ -66,6 +66,11 @@ public class Character : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
+        if (GameObject.FindGameObjectWithTag("Narrative") != null)
+        {
+            return;
+        }
+
 		if (InputManager.Devices.Count >= playerId && isAlive) {
 			controller = InputManager.Devices [playerId - 1];
 			action = controller.GetControl (InputControlType.Action1);

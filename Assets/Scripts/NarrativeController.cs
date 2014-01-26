@@ -5,7 +5,7 @@ using InControl;
 public class NarrativeController : MonoBehaviour {
 
     public string[] messages;
-    public int nextLevel;
+    public bool reset = false;
 
     int messageIndex;
 
@@ -21,7 +21,8 @@ public class NarrativeController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        InputManager.Setup();
+        if (reset)
+            InputManager.Setup();
 
         messageIndex = 0;
         ChangeText(messageIndex);
@@ -61,7 +62,11 @@ public class NarrativeController : MonoBehaviour {
                     ++messageIndex;
                     if (messageIndex > messages.Length)
                     {
-                        Application.LoadLevel(nextLevel);
+                        if (reset)
+                        {
+                            Application.LoadLevel(0);
+                        }
+                        Destroy(gameObject);
                     }
                     else
                     {
